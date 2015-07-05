@@ -1,0 +1,104 @@
+﻿<div class="panel panel-default">
+    <div class="panel-heading">
+        @if (TempData["message"] != null)
+        {
+            <h1>@TempData["message"]</h1>
+        }
+    </div>
+    <div class="panel-body">
+        <div class="table-responsive">
+            <table id="parameter-list" class="table table-striped table-bordered table-condensed table-hover compact">
+                <thead>
+                    <tr data-detailtemplate="details-template">
+                        <th>Id</th>
+                        <th>Name</th>
+                        <th>Nickname</th>
+                        <th>E-mail</th>
+                        <th>Details</th>
+                        <th data-template="actions-template"></th>
+                    </tr>
+                </thead>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script id="details-template" type="text/x-handlebars-template">
+    <tr>
+        <td colspan="7">
+            <table cellpadding="5" cellspacing="0" border="0" style="margin-left: 50px;">
+                <tr>
+                    <td><b>Country:</b></td>
+                    <td>{{Country}}</td>
+                </tr>
+                <tr>
+                    <td><b>Birth date:</b></td>
+                    <td>{{BirthDate}}</td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+</script>
+
+<script id="actions-template" type="text/x-handlebars-template">
+    <a href="@Url.Action("Edit", "Home")/{{Id}}" class='btn btn-default btn-xs'><span class='glyphicon glyphicon-pencil' />&nbsp;Edit</a>
+    <a href="@Url.Action("Delete", "Home")/{{Id}}" class='btn btn-default btn-xs' data-confirm="Are you sure you want to delete?"><span class='glyphicon glyphicon-remove' />&nbsp;Delete</a>
+</script>
+
+@section scripts {
+    <script type="text/javascript">
+        var dt = null;
+
+        function startDataTable() {
+            // wait for scripts to load
+            if (!$.fn.DataTable) {
+                setTimeout(startDataTable, 100);
+                return;
+            }
+
+            dt = $('#parameter-list').dataTable({
+                ajax: {
+                    url: '@Url.Action("Index", "Home")'
+                },
+                order: [[0, "asc"]], // default sort to ID
+                columns: [
+                    { data: 'Id' },
+                    { data: 'Name' },
+                    { data: 'Nickname' },
+                    { data: 'Email' },
+                    {
+                        data: null,
+                        orderable: false,
+                        className: 'details-control',
+                        defaultContent: ''
+                    },
+                    { data: null, sortable: false } // disable sorting of actions column
+                ],
+                stateSave: true,
+                stateDuration: 60,
+                autoWidth: false,
+                initComplete: function(settings, json) {
+                    dt.fnAdjustColumnSizing(false);
+                    dt.fnSetFilteringEnterPress();
+                }
+            });
+        };
+    </script>
+    <script type="text/javascript">
+        $(document).ready(function() {
+            startDataTable();
+        });
+    </script>
+}
+
+@section styles {
+    <style>
+        td.details-control {
+            background: url('@Url.Content("~/Images/details_open.png")') no-repeat center center;
+            cursor: pointer;
+        }
+        tr.shown td.details-control {
+            background: url('@Url.Content("~/Images/details_close.png")') no-repeat center center;
+        }
+    </style>
+}
