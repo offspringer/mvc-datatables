@@ -15,7 +15,7 @@ namespace Mvc.Datatables.Formatters
 		public static readonly string ApplicationDatatablesMediaType = "application/datatables";
 		public static readonly string TextDatatablesMediaType = "text/datatables";
 
-        public LegacyDatatablesMediaTypeFormatter()
+		public LegacyDatatablesMediaTypeFormatter()
 			: base()
 		{
 			this.SupportedMediaTypes.Clear();
@@ -25,10 +25,10 @@ namespace Mvc.Datatables.Formatters
 			this.MediaTypeMappings.Clear();
 			this.AddRequestHeaderMapping("x-requested-with", "XMLHttpRequest", StringComparison.OrdinalIgnoreCase, true, ApplicationDatatablesMediaType);
 
-            this.SerializerSettings.Converters.Add(new LegacyFilterRequestConverter());
-            this.SerializerSettings.Converters.Add(new LegacyPageResponseConverter());
+			this.SerializerSettings.Converters.Add(new LegacyFilterRequestConverter());
+			this.SerializerSettings.Converters.Add(new LegacyPageResponseConverter());
 
-            this.SerializerSettings.Formatting = Formatting.Indented;
+			this.SerializerSettings.Formatting = Formatting.Indented;
 		}
 
 		public new static MediaTypeHeaderValue DefaultMediaType
@@ -46,12 +46,20 @@ namespace Mvc.Datatables.Formatters
 
 		public override bool CanReadType(Type type)
 		{
-			return true;
+			foreach (var converter in this.SerializerSettings.Converters)
+				if (converter.CanConvert(type))
+					return true;
+
+			return false;
 		}
 
 		public override bool CanWriteType(Type type)
 		{
-			return true;
+			foreach (var converter in this.SerializerSettings.Converters)
+				if (converter.CanConvert(type))
+					return true;
+
+			return false;
 		}
 
 		public override Task<object> ReadFromStreamAsync(Type type, Stream readStream, HttpContent content, IFormatterLogger formatterLogger)
