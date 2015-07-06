@@ -137,6 +137,7 @@
     <Compile Include="Util\TypeExtensions.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Mvc.Datatables.nuspec" />
     <None Include="Mvc.Datatables.snk" />
     <None Include="packages.config" />
   </ItemGroup>

@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<package >
+	<metadata>
+		<id>$id$</id>
+		<version>$version$</version>
+		<title>$title$</title>
+		<authors>Harry McIntyre, Christopher Deutsch, Roger Santos</authors>
+		<owners>Roger Santos</owners>
+		<licenseUrl>https://github.com/offspringer/mvc.datatables/blob/master/LICENSE</licenseUrl>
+		<projectUrl>https://github.com/offspringer/mvc.datatables</projectUrl>
+		<iconUrl>http://www.datatables.net/media/images/DataTables.jpg</iconUrl>
+		<requireLicenseAcceptance>false</requireLicenseAcceptance>
+		<description>$description$</description>
+		<releaseNotes>First release.</releaseNotes>
+		<copyright>Copyright 2015</copyright>
+		<tags>mvc jquery datatables</tags>
+	</metadata>
+</package>
