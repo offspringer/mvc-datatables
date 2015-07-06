@@ -61,29 +61,7 @@ namespace Mvc.Datatables.Serialization
                     otherProperties.Add(property.Name, property);
             }
 
-            foreach (Type type in objectType.GetInheritancHierarchy())
-            {
-                if (type == typeof(FilterRequest))
-                    break;
-
-                PropertyInfo[] propertiesInfos = type.GetProperties(BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly);
-                foreach (PropertyInfo propertyInfo in propertiesInfos)
-                {
-                    JsonIgnoreAttribute ignoreAttr = propertyInfo.GetCustomAttribute<JsonIgnoreAttribute>();
-                    if (ignoreAttr == null)
-                    {
-                        JsonPropertyAttribute propAttr = propertyInfo.GetCustomAttribute<JsonPropertyAttribute>();
-                        string propertyName = propAttr != null ? propAttr.PropertyName : propertyInfo.Name;
-
-                        if (otherProperties.ContainsKey(propertyName))
-                        {
-                            object value = otherProperties[propertyName].Value.ToObject(propertyInfo.PropertyType,
-                                serializer);
-                            propertyInfo.SetValue(message, value);
-                        }
-                    }
-                }
-            }
+            JsonConvertHelper.ReadJson(ref message, otherProperties, serializer, type => type == typeof(FilterRequest));
 
             return message;
         }
@@ -198,26 +176,7 @@ namespace Mvc.Datatables.Serialization
                 }
             }
 
-            foreach (Type type in value.GetType().GetInheritancHierarchy())
-            {
-                if (type == typeof(FilterRequest))
-                    break;
-
-                PropertyInfo[] properties = type.GetProperties(BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly);
-                foreach (PropertyInfo property in properties)
-                {
-                    JsonIgnoreAttribute ignoreAttr = property.GetCustomAttribute<JsonIgnoreAttribute>();
-                    if (ignoreAttr == null)
-                    {
-                        JsonPropertyAttribute propAttr = property.GetCustomAttribute<JsonPropertyAttribute>();
-                        string propertyName = propAttr != null ? propAttr.PropertyName : property.Name;
-                        object propertyValue = property.GetValue(value);
-
-                        writer.WritePropertyName(propertyName);
-                        serializer.Serialize(writer, propertyValue);
-                    }
-                }
-            }
+            JsonConvertHelper.WriteJson(ref message, writer, serializer, type => type == typeof(FilterRequest));
 
             writer.WriteEndObject();
         }

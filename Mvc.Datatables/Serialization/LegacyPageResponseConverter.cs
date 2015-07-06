@@ -50,29 +50,11 @@ namespace Mvc.Datatables.Serialization
                     otherProperties.Add(property.Name, property);
             }
 
-            foreach (Type type in objectType.GetInheritancHierarchy())
+            JsonConvertHelper.ReadJson(ref message, otherProperties, serializer, type =>
             {
-                if (type == typeof(PageResponse) || (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(PageResponse<>)))
-                    break;
-
-                PropertyInfo[] propertiesInfos = type.GetProperties(BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly);
-                foreach (PropertyInfo propertyInfo in propertiesInfos)
-                {
-                    JsonIgnoreAttribute ignoreAttr = propertyInfo.GetCustomAttribute<JsonIgnoreAttribute>();
-                    if (ignoreAttr == null)
-                    {
-                        JsonPropertyAttribute propAttr = propertyInfo.GetCustomAttribute<JsonPropertyAttribute>();
-                        string propertyName = propAttr != null ? propAttr.PropertyName : propertyInfo.Name;
-
-                        if (otherProperties.ContainsKey(propertyName))
-                        {
-                            object value = otherProperties[propertyName].Value.ToObject(propertyInfo.PropertyType,
-                                serializer);
-                            propertyInfo.SetValue(message, value);
-                        }
-                    }
-                }
-            }
+                return type == typeof(PageResponse)
+                    || type.IsGenericType && type.GetGenericTypeDefinition() == typeof(PageResponse<>);
+            });
 
             return message;
         }
@@ -98,26 +80,11 @@ namespace Mvc.Datatables.Serialization
                 serializer.Serialize(writer, message.Data);
             }
 
-            foreach (Type type in value.GetType().GetInheritancHierarchy())
+            JsonConvertHelper.WriteJson(ref message, writer, serializer, type =>
             {
-                if (type == typeof(PageResponse) || (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(PageResponse<>)))
-                    break;
-
-                PropertyInfo[] properties = type.GetProperties(BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly);
-                foreach (PropertyInfo property in properties)
-                {
-                    JsonIgnoreAttribute ignoreAttr = property.GetCustomAttribute<JsonIgnoreAttribute>();
-                    if (ignoreAttr == null)
-                    {
-                        JsonPropertyAttribute propAttr = property.GetCustomAttribute<JsonPropertyAttribute>();
-                        string propertyName = propAttr != null ? propAttr.PropertyName : property.Name;
-                        object propertyValue = property.GetValue(value);
-
-                        writer.WritePropertyName(propertyName);
-                        serializer.Serialize(writer, propertyValue);
-                    }
-                }
-            }
+                return type == typeof(PageResponse)
+                    || type.IsGenericType && type.GetGenericTypeDefinition() == typeof(PageResponse<>);
+            });
 
             writer.WriteEndObject();
         }

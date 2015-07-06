@@ -132,6 +132,7 @@
     <Compile Include="Serialization\LegacyFilterRequestModelBinder.cs" />
     <Compile Include="Serialization\LegacyPageResponseConverter.cs" />
     <Compile Include="Serialization\PageResponseConverter.cs" />
+    <Compile Include="Util\JsonConvertHelper.cs" />
     <Compile Include="Util\TransformTypeInfo.cs" />
     <Compile Include="Processing\TypeFilters.cs" />
     <Compile Include="Util\TypeExtensions.cs" />
