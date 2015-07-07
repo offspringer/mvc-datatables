@@ -1,11 +1,13 @@
 ﻿using Mvc.Datatables.Serialization;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 using System;
 using System.IO;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Formatting;
 using System.Net.Http.Headers;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace Mvc.Datatables.Formatters
@@ -27,8 +29,10 @@ namespace Mvc.Datatables.Formatters
 
 			this.SerializerSettings.Converters.Add(new FilterRequestConverter());
 			this.SerializerSettings.Converters.Add(new PageResponseConverter());
+            this.SerializerSettings.Converters.Add(new StringEnumConverter());
 
 			this.SerializerSettings.Formatting = Formatting.Indented;
+            this.SerializerSettings.NullValueHandling = NullValueHandling.Ignore;
 		}
 
 		public new static MediaTypeHeaderValue DefaultMediaType
@@ -64,12 +68,32 @@ namespace Mvc.Datatables.Formatters
 
 		public override Task<object> ReadFromStreamAsync(Type type, Stream readStream, HttpContent content, IFormatterLogger formatterLogger)
 		{
-			return base.ReadFromStreamAsync(type, readStream, content, formatterLogger);
+            var task = Task<object>.Factory.StartNew(() =>
+            {
+                var sr = new StreamReader(readStream);
+                var jreader = new JsonTextReader(sr);
+
+                var ser = JsonSerializer.Create(this.SerializerSettings);
+
+                object val = ser.Deserialize(jreader, type);
+                return val;
+            });
+
+            return task;
 		}
 
 		public override Task WriteToStreamAsync(Type type, object value, Stream writeStream, HttpContent content, TransportContext transportContext)
 		{
-			return base.WriteToStreamAsync(type, value, writeStream, content, transportContext);
+            var task = Task.Factory.StartNew(() =>
+            {
+                string json = JsonConvert.SerializeObject(value, this.SerializerSettings);
+
+                byte[] buf = Encoding.Default.GetBytes(json);
+                writeStream.Write(buf, 0, buf.Length);
+                writeStream.Flush();
+            });
+
+            return task;
 		}
 	}
 }
