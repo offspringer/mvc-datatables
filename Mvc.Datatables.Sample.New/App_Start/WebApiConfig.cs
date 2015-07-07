@@ -1,6 +1,4 @@
 ﻿using Mvc.Datatables.Formatters;
-using Newtonsoft.Json;
-using System.Net.Http.Formatting;
 using System.Web.Http;
 
 namespace Mvc.Datatables.Sample
@@ -20,21 +18,9 @@ namespace Mvc.Datatables.Sample
                 defaults: new { id = RouteParameter.Optional }
             );
 
-            // Add a custom formatter
+            // Add custom formatters
             config.Formatters.Insert(0, new DatatablesMediaTypeFormatter());
-
-            // Add a custom converter
-            foreach (var formatter in GlobalConfiguration.Configuration.Formatters)
-            {
-                var jsonFormatter = formatter as JsonMediaTypeFormatter;
-                if (jsonFormatter == null)
-                    continue;
-
-                jsonFormatter.SerializerSettings.Formatting = Formatting.Indented;
-                // No longer necessary when using DatatablesMediaTypeFormatter and "application/datatables" media type
-                //jsonFormatter.SerializerSettings.Converters.Add(new FilterRequestConverter());
-                //jsonFormatter.SerializerSettings.Converters.Add(new PageResponseConverter());
-            }
+            config.Formatters.Insert(1, new DatatablesXmlMediaTypeFormatter());
         }
     }
 }

@@ -1,4 +1,6 @@
-﻿
+﻿using System;
+using System.Xml.Serialization;
+
 namespace Mvc.Datatables
 {
 	/// <summary>
@@ -24,6 +26,8 @@ namespace Mvc.Datatables
 		/// <summary>
 		/// The data to be displayed in the table. This is an array of data source objects, one for each row, which will be used by DataTables. Note that this parameter's name can be changed using the ajaxDT option's dataSrc property.
 		/// </summary>
+		[XmlArray("Data")]
+		[XmlArrayItem("Item")]
 		public object[] Data { get; set; }
 
 		/// <summary>

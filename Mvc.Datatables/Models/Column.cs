@@ -1,12 +1,12 @@
 ﻿
 namespace Mvc.Datatables
 {
-    /// <summary>
-    /// Columns' parameters for filter requests
-    /// </summary>
-    public class Column
-    {
-        /// <summary>
+	/// <summary>
+	/// Columns' parameters for filter requests
+	/// </summary>
+	public class Column
+	{
+		/// <summary>
 		/// Column's data source.
 		/// </summary>
 		public string Data { get; set; }

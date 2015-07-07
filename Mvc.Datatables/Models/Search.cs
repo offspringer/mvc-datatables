@@ -1,4 +1,5 @@
-﻿
+﻿using System;
+
 namespace Mvc.Datatables
 {
 	public class Search

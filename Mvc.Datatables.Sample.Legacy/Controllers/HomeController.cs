@@ -43,11 +43,11 @@ namespace Mvc.Datatables.Sample.Controllers
             // Prepare input
             string serializedObject = JsonConvert.SerializeObject(filter, new LegacyFilterRequestConverter());
             StringContent stringContent = new StringContent(
-                serializedObject, UnicodeEncoding.UTF8, "application/json");
+                serializedObject, UnicodeEncoding.UTF8, "application/json+datatables");
 
             // Post
             HttpClient client = new HttpClient();
-            client.BaseAddress = new Uri("http://localhost:5058/");
+            client.BaseAddress = new Uri(this.Request.Url, this.Url.Content("~"));
             HttpResponseMessage response = client.PostAsync("api/values", stringContent).Result;
             response.EnsureSuccessStatusCode();
             string responseBody = response.Content.ReadAsStringAsync().Result;

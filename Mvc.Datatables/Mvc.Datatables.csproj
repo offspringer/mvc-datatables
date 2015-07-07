@@ -91,6 +91,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Formatters\DatatablesXmlMediaTypeFormatter.cs" />
     <Compile Include="Formatters\LegacyDatatablesMediaTypeFormatter.cs" />
     <Compile Include="Formatters\DatatablesMediaTypeFormatter.cs" />
     <Compile Include="Models\OutputType.cs" />

@@ -43,7 +43,7 @@ namespace Mvc.Datatables.Sample.Controllers
             // Prepare input
             string serializedObject = JsonConvert.SerializeObject(filter, new FilterRequestConverter());
             StringContent stringContent = new StringContent(
-                serializedObject, UnicodeEncoding.UTF8, "application/datatables");
+                serializedObject, UnicodeEncoding.UTF8, "application/json+datatables");
 
             // Post
             HttpClient client = new HttpClient();
