@@ -59,7 +59,10 @@
     <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Core" />
     <Reference Include="System.Net.Http" />
-    <Reference Include="System.Net.Http.Formatting, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
+    <Reference Include="System.Net.Http.Formatting, Version=5.2.3.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.WebApi.Client.5.2.3\lib\net45\System.Net.Http.Formatting.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System.Web" />
     <Reference Include="System.Web.Extensions" />
     <Reference Include="System.Web.Helpers, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
@@ -91,8 +94,15 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Formatters\DatatablesXmlMediaTypeFormatter.cs" />
     <Compile Include="Formatters\LegacyDatatablesMediaTypeFormatter.cs" />
     <Compile Include="Formatters\DatatablesMediaTypeFormatter.cs" />
+    <Compile Include="Models\IColumn.cs" />
+    <Compile Include="Models\IFilterRequest.cs" />
+    <Compile Include="Models\IPageResponse.cs" />
+    <Compile Include="Models\IPageResponse[TSource].cs" />
+    <Compile Include="Models\ISearch.cs" />
+    <Compile Include="Models\ISort.cs" />
     <Compile Include="Models\OutputType.cs" />
     <Compile Include="Models\IDataTableMessage.cs" />
     <Compile Include="Models\Sort.cs" />
@@ -132,12 +142,16 @@
     <Compile Include="Serialization\LegacyFilterRequestModelBinder.cs" />
     <Compile Include="Serialization\LegacyPageResponseConverter.cs" />
     <Compile Include="Serialization\PageResponseConverter.cs" />
+    <Compile Include="Util\FormConvertHelper.cs" />
     <Compile Include="Util\JsonConvertHelper.cs" />
+    <Compile Include="Util\ModelExtensions.cs" />
     <Compile Include="Util\TransformTypeInfo.cs" />
     <Compile Include="Processing\TypeFilters.cs" />
     <Compile Include="Util\TypeExtensions.cs" />
+    <Compile Include="Util\TypeHelper.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="app.config" />
     <None Include="Mvc.Datatables.nuspec" />
     <None Include="Mvc.Datatables.snk" />
     <None Include="packages.config" />

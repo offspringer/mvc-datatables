@@ -5,65 +5,65 @@ using System.Web;
 
 namespace Mvc.Datatables.Processing
 {
-	public static class StringTransformers
-	{
-		private static readonly Dictionary<Type, StringTransformer> _transformers = new Dictionary<Type, StringTransformer>();
+    public static class StringTransformers
+    {
+        private static readonly Dictionary<Type, StringTransformer> _transformers = new Dictionary<Type, StringTransformer>();
 
-		public delegate object GuardedValueTransformer<TVal>(TVal value);
+        public delegate object GuardedValueTransformer<TVal>(TVal value);
 
-		public delegate object StringTransformer(Type type, object value);
+        public delegate object StringTransformer(Type type, object value);
 
-		static StringTransformers()
-		{
-			RegisterFilter<DateTimeOffset>(dateTimeOffset => dateTimeOffset.ToLocalTime().ToString("g"));
-			RegisterFilter<DateTime>(dateTime => dateTime.ToString("g"));
-			RegisterFilter<IHtmlString>(s => s.ToHtmlString());
-			RegisterFilter<IEnumerable<string>>(s => s.ToArray());
-			RegisterFilter<IEnumerable<int>>(s => s.ToArray());
-			RegisterFilter<IEnumerable<long>>(s => s.ToArray());
-			RegisterFilter<IEnumerable<decimal>>(s => s.ToArray());
-			RegisterFilter<IEnumerable<bool>>(s => s.ToArray());
-			RegisterFilter<IEnumerable<double>>(s => s.ToArray());
-			RegisterFilter<IEnumerable<object>>(s => s.Select(o => GetStringedValue(o.GetType(), o)).ToArray());
-			RegisterFilter<bool>(s => s);
-			RegisterFilter<object>(o => (o ?? "").ToString());
-		}
+        static StringTransformers()
+        {
+            RegisterFilter<DateTimeOffset>(dateTimeOffset => dateTimeOffset.ToLocalTime().ToString("g"));
+            RegisterFilter<DateTime>(dateTime => dateTime.ToString("g"));
+            RegisterFilter<IHtmlString>(s => s.ToHtmlString());
+            RegisterFilter<IEnumerable<string>>(s => s.ToArray());
+            RegisterFilter<IEnumerable<int>>(s => s.ToArray());
+            RegisterFilter<IEnumerable<long>>(s => s.ToArray());
+            RegisterFilter<IEnumerable<decimal>>(s => s.ToArray());
+            RegisterFilter<IEnumerable<bool>>(s => s.ToArray());
+            RegisterFilter<IEnumerable<double>>(s => s.ToArray());
+            RegisterFilter<IEnumerable<object>>(s => s.Select(o => GetStringedValue(o.GetType(), o)).ToArray());
+            RegisterFilter<bool>(s => s);
+            RegisterFilter<object>(o => (o ?? "").ToString());
+        }
 
-		internal static object GetStringedValue(Type propertyType, object value)
-		{
-			if (_transformers.ContainsKey(propertyType))
-				return _transformers[propertyType](propertyType, value);
-			return (value as object ?? "").ToString();
-		}
+        internal static object GetStringedValue(Type propertyType, object value)
+        {
+            if (_transformers.ContainsKey(propertyType))
+                return _transformers[propertyType](propertyType, value);
+            return (value as object ?? "").ToString();
+        }
 
-		public static void RegisterFilter<TVal>(GuardedValueTransformer<TVal> filter)
-		{
-			if (_transformers.ContainsKey(typeof(TVal)))
-				_transformers[typeof(TVal)] = Guard(filter);
-			else
-				_transformers.Add(typeof(TVal), Guard(filter));
-		}
+        public static void RegisterFilter<TVal>(GuardedValueTransformer<TVal> filter)
+        {
+            if (_transformers.ContainsKey(typeof(TVal)))
+                _transformers[typeof(TVal)] = Guard(filter);
+            else
+                _transformers.Add(typeof(TVal), Guard(filter));
+        }
 
-		private static StringTransformer Guard<TVal>(GuardedValueTransformer<TVal> transformer)
-		{
-			return (t, v) =>
-			{
-				if (!typeof(TVal).IsAssignableFrom(t))
-				{
-					return null;
-				}
-				return transformer((TVal)v);
-			};
-		}
+        private static StringTransformer Guard<TVal>(GuardedValueTransformer<TVal> transformer)
+        {
+            return (t, v) =>
+            {
+                if (!typeof(TVal).IsAssignableFrom(t))
+                {
+                    return null;
+                }
+                return transformer((TVal)v);
+            };
+        }
 
-		public static Dictionary<string, object> StringifyValues(Dictionary<string, object> dict)
-		{
-			var output = new Dictionary<string, object>();
-			foreach (var row in dict)
-			{
-				output[row.Key] = row.Value == null ? "" : GetStringedValue(row.Value.GetType(), row.Value);
-			}
-			return output;
-		}
-	}
+        public static Dictionary<string, object> StringifyValues(Dictionary<string, object> dict)
+        {
+            var output = new Dictionary<string, object>();
+            foreach (var row in dict)
+            {
+                output[row.Key] = row.Value == null ? "" : GetStringedValue(row.Value.GetType(), row.Value);
+            }
+            return output;
+        }
+    }
 }

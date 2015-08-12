@@ -4,181 +4,183 @@ using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 
 namespace Mvc.Datatables.Serialization
 {
-    public class LegacyFilterRequestConverter : JsonConverter
-    {
-        public override bool CanConvert(Type objectType)
-        {
-            return objectType == typeof(FilterRequest) || objectType.IsSubclassOf(typeof(FilterRequest));
-        }
+	public class LegacyFilterRequestConverter : JsonConverter
+	{
+		public override bool CanConvert(Type objectType)
+		{
+			return objectType.GetInterfaces().Any(x => x == typeof(IFilterRequest));
+		}
 
-        public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
-        {
-            JObject jsonObject = JObject.Load(reader);
-            IEnumerable<JProperty> properties = jsonObject.Properties();
-            Dictionary<string, JProperty> otherProperties = new Dictionary<string, JProperty>();
+		public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
+		{
+			JObject jsonObject = JObject.Load(reader);
+			IEnumerable<JProperty> properties = jsonObject.Properties();
+			Dictionary<string, JProperty> otherProperties = new Dictionary<string, JProperty>();
 
-            FilterRequest message = Activator.CreateInstance(objectType) as FilterRequest;
+			IFilterRequest message = Activator.CreateInstance(objectType) as IFilterRequest;
 
-            foreach (JProperty property in properties)
-            {
-                if (property.Name == "sEcho")
-                    message.Draw = property.Value.ToObject<int>();
+			foreach (JProperty property in properties)
+			{
+				if (property.Name == "sEcho")
+					message.Draw = property.Value.ToObject<int>();
 
-                else if (property.Name == "iDisplayStart")
-                    message.Start = property.Value.ToObject<int>();
+				else if (property.Name == "iDisplayStart")
+					message.Start = property.Value.ToObject<int>();
 
-                else if (property.Name == "iDisplayLength")
-                    message.Length = property.Value.ToObject<int>();
+				else if (property.Name == "iDisplayLength")
+					message.Length = property.Value.ToObject<int>();
 
-                else if (property.Name == "sSearch")
-                    message.Search.Value = property.Value.ToObject<string>();
+				else if (property.Name == "sSearch")
+					message.Search.Value = property.Value.ToObject<string>();
 
-                else if (property.Name == "bEscapeRegex")
-                    message.Search.IsRegex = property.Value.ToObject<bool>();
+				else if (property.Name == "bEscapeRegex")
+					message.Search.IsRegex = property.Value.ToObject<bool>();
 
-                else if (property.Name == "iSortingCols")
-                    message.Sort.Capacity = property.Value.ToObject<int>();
+				else if (property.Name == "iSortingCols")
+					message.Sort.Capacity = property.Value.ToObject<int>();
 
-                else if (property.Name == "iColumns")
-                    continue;
+				else if (property.Name == "iColumns")
+					continue;
 
-                else if (property.Name.StartsWith("iSortCol")
-                    || property.Name.StartsWith("sSortDir"))
-                    ReadSortConfiguration(ref message, property);
+				else if (property.Name.StartsWith("iSortCol")
+					|| property.Name.StartsWith("sSortDir"))
+					ReadSortConfiguration(ref message, property);
 
-                else if (property.Name.StartsWith("mDataProp")
-                    || property.Name.StartsWith("bSearchable")
-                    || property.Name.StartsWith("bSortable")
-                    || property.Name.StartsWith("sSearch")
-                    || property.Name.StartsWith("bRegex"))
-                    ReadColumnConfiguration(ref message, property);
+				else if (property.Name.StartsWith("mDataProp")
+					|| property.Name.StartsWith("bSearchable")
+					|| property.Name.StartsWith("bSortable")
+					|| property.Name.StartsWith("sSearch")
+					|| property.Name.StartsWith("bRegex"))
+					ReadColumnConfiguration(ref message, property);
 
-                else
-                    otherProperties.Add(property.Name, property);
-            }
+				else
+					otherProperties.Add(property.Name, property);
+			}
 
-            JsonConvertHelper.ReadJson(ref message, otherProperties, serializer, type => type == typeof(FilterRequest));
+			JsonConvertHelper.ReadJson(message, otherProperties, serializer,
+				prop => JsonConvertHelper.GetPropertiesFromType(typeof(IFilterRequest)).Select(x => x.Name).Contains(prop.Name));
 
-            return message;
-        }
-        private void ReadSortConfiguration(ref FilterRequest message, JProperty property)
-        {
-            int separatorIndex = property.Name.LastIndexOf("_");
-            int index = Convert.ToInt32(property.Name.Substring(separatorIndex + 1));
-            string propertyName = property.Name.Substring(0, separatorIndex);
+			return message;
+		}
 
-            while (index >= message.Sort.Count)
-                message.Sort.Add(new Sort());
-            
-            if (propertyName == "iSortCol")
-                message.Sort[index].Column = property.Value.ToObject<int>();
+		private void ReadSortConfiguration(ref IFilterRequest message, JProperty property)
+		{
+			int separatorIndex = property.Name.LastIndexOf("_");
+			int index = Convert.ToInt32(property.Name.Substring(separatorIndex + 1));
+			string propertyName = property.Name.Substring(0, separatorIndex);
 
-            else if (propertyName == "sSortDir")
-                message.Sort[index].Direction = property.Value.ToObject<string>().AsSortDirection();
-        }
+			while (index >= message.Sort.Count)
+				message.Sort.Add(new Sort());
 
-        private void ReadColumnConfiguration(ref FilterRequest message, JProperty property)
-        {
-            int separatorIndex = property.Name.LastIndexOf("_");
-            int index = Convert.ToInt32(property.Name.Substring(separatorIndex + 1));
-            string propertyName = property.Name.Substring(0, separatorIndex);
+			if (propertyName == "iSortCol")
+				message.Sort[index].Column = property.Value.ToObject<int>();
 
-            Column currentColumn = null;
+			else if (propertyName == "sSortDir")
+				message.Sort[index].Direction = property.Value.ToObject<string>().AsSortDirection();
+		}
 
-            if (!message.HasColumn(index))
-            {
-                currentColumn = new Column();
-                message.Columns.Add(index, currentColumn);
-            }
-            else
-                currentColumn = message.GetColumn(index);
+		private void ReadColumnConfiguration(ref IFilterRequest message, JProperty property)
+		{
+			int separatorIndex = property.Name.LastIndexOf("_");
+			int index = Convert.ToInt32(property.Name.Substring(separatorIndex + 1));
+			string propertyName = property.Name.Substring(0, separatorIndex);
 
-            if (propertyName == "mDataProp")
-                currentColumn.Data = property.Value.ToObject<string>();
+			IColumn currentColumn = null;
 
-            else if (propertyName == "bSearchable")
-                currentColumn.Searchable = property.Value.ToObject<bool>();
+			if (!message.HasColumn(index))
+			{
+				currentColumn = new Column();
+				message.Columns.Add(index, currentColumn);
+			}
+			else
+				currentColumn = message.GetColumn(index);
 
-            else if (propertyName == "bSortable")
-                currentColumn.Sortable = property.Value.ToObject<bool>();
+			if (propertyName == "mDataProp")
+				currentColumn.Data = property.Value.ToObject<string>();
 
-            else if (propertyName == "sSearch")
-                currentColumn.Search.Value = property.Value.ToObject<string>();
+			else if (propertyName == "bSearchable")
+				currentColumn.Searchable = property.Value.ToObject<bool>();
 
-            else if (propertyName == "bRegex")
-                currentColumn.Search.IsRegex = property.Value.ToObject<bool>();
-        }
+			else if (propertyName == "bSortable")
+				currentColumn.Sortable = property.Value.ToObject<bool>();
 
-        public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
-        {
-            writer.WriteStartObject();
+			else if (propertyName == "sSearch")
+				currentColumn.Search.Value = property.Value.ToObject<string>();
 
-            FilterRequest message = value as FilterRequest;
+			else if (propertyName == "bRegex")
+				currentColumn.Search.IsRegex = property.Value.ToObject<bool>();
+		}
 
-            if (message != null)
-            {
-                writer.WritePropertyName("sEcho");
-                writer.WriteValue(message.Draw);
+		public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
+		{
+			writer.WriteStartObject();
 
-                writer.WritePropertyName("iDisplayStart");
-                writer.WriteValue(message.Start);
+			IFilterRequest message = value as IFilterRequest;
 
-                writer.WritePropertyName("iDisplayLength");
-                writer.WriteValue(message.Length);
+			if (message != null)
+			{
+				writer.WritePropertyName("sEcho");
+				writer.WriteValue(message.Draw);
 
-                if (!string.IsNullOrWhiteSpace(message.Search.Value))
-                {
-                    writer.WritePropertyName("sSearch");
-                    writer.WriteValue(message.Search.Value);
+				writer.WritePropertyName("iDisplayStart");
+				writer.WriteValue(message.Start);
 
-                    writer.WritePropertyName("bEscapeRegex");
-                    writer.WriteValue(message.Search.IsRegex);
-                }
+				writer.WritePropertyName("iDisplayLength");
+				writer.WriteValue(message.Length);
 
-                writer.WritePropertyName("iColumns");
-                writer.WriteValue(message.Columns.Count);
+				if (!string.IsNullOrWhiteSpace(message.Search.Value))
+				{
+					writer.WritePropertyName("sSearch");
+					writer.WriteValue(message.Search.Value);
 
-                writer.WritePropertyName("iSortingCols");
-                writer.WriteValue(message.Sort.Count);
+					writer.WritePropertyName("bEscapeRegex");
+					writer.WriteValue(message.Search.IsRegex);
+				}
 
-                for (int i = 0; i < message.Sort.Count; i++)
-                {
-                    writer.WritePropertyName("iSortCol_" + i);
-                    writer.WriteValue(message.Sort[i].Column);
+				writer.WritePropertyName("iColumns");
+				writer.WriteValue(message.Columns.Count);
 
-                    writer.WritePropertyName("sSortDir_" + i);
-                    writer.WriteValue(message.Sort[i].Direction.AsString());
-                }
+				writer.WritePropertyName("iSortingCols");
+				writer.WriteValue(message.Sort.Count);
 
-                foreach (KeyValuePair<int, Column> column in message.Columns.OrderBy(x => x.Key))
-                {
-                    writer.WritePropertyName("mDataProp_" + column.Key);
-                    writer.WriteValue(column.Value.Data);
+				for (int i = 0; i < message.Sort.Count; i++)
+				{
+					writer.WritePropertyName("iSortCol_" + i);
+					writer.WriteValue(message.Sort[i].Column);
 
-                    writer.WritePropertyName("bSearchable_" + column.Key);
-                    writer.WriteValue(column.Value.Searchable);
+					writer.WritePropertyName("sSortDir_" + i);
+					writer.WriteValue(message.Sort[i].Direction.AsString());
+				}
 
-                    writer.WritePropertyName("bSortable_" + column.Key);
-                    writer.WriteValue(column.Value.Sortable);
+				foreach (KeyValuePair<int, IColumn> column in message.Columns.OrderBy(x => x.Key))
+				{
+					writer.WritePropertyName("mDataProp_" + column.Key);
+					writer.WriteValue(column.Value.Data);
 
-                    if (!string.IsNullOrWhiteSpace(column.Value.Search.Value))
-                    {
-                        writer.WritePropertyName("sSearch_" + column.Key);
-                        writer.WriteValue(column.Value.Search.Value);
+					writer.WritePropertyName("bSearchable_" + column.Key);
+					writer.WriteValue(column.Value.Searchable);
 
-                        writer.WritePropertyName("bRegex_" + column.Key);
-                        writer.WriteValue(column.Value.Search.IsRegex);
-                    }
-                }
-            }
+					writer.WritePropertyName("bSortable_" + column.Key);
+					writer.WriteValue(column.Value.Sortable);
 
-            JsonConvertHelper.WriteJson(ref message, writer, serializer, type => type == typeof(FilterRequest));
+					if (!string.IsNullOrWhiteSpace(column.Value.Search.Value))
+					{
+						writer.WritePropertyName("sSearch_" + column.Key);
+						writer.WriteValue(column.Value.Search.Value);
 
-            writer.WriteEndObject();
-        }
-    }
+						writer.WritePropertyName("bRegex_" + column.Key);
+						writer.WriteValue(column.Value.Search.IsRegex);
+					}
+				}
+			}
+
+			JsonConvertHelper.WriteJson(message, writer, serializer,
+				prop => JsonConvertHelper.GetPropertiesFromType(typeof(IFilterRequest)).Select(x => x.Name).Contains(prop.Name));
+
+			writer.WriteEndObject();
+		}
+	}
 }

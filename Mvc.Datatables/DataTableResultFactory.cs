@@ -19,7 +19,7 @@ namespace Mvc.Datatables
         /// <param name="transform">A transform for custom column rendering e.g. to do a custom date row => new { CreatedDate = row.CreatedDate.ToString("dd MM yy") }</param>
         /// <param name="outputType">The output type</param>
         /// <returns>The action result</returns>
-        public static MutableDataTableResult CreateMutable<TSource, TTransform>(IQueryable<TSource> query, FilterRequest request,
+        public static MutableDataTableResult CreateMutable<TSource, TTransform>(IQueryable<TSource> query, IFilterRequest request,
             Func<TSource, TTransform> transform, OutputType? outputType = null, ArrayOutputType? arrayOutputType = null)
         {
             var result = new MutableDataTableResult(query.Cast<object>(), request, outputType);
@@ -33,7 +33,7 @@ namespace Mvc.Datatables
             return result;
         }
 
-        public static MutableDataTableResult CreateMutable<TSource>(IQueryable<TSource> query, FilterRequest request,
+        public static MutableDataTableResult CreateMutable<TSource>(IQueryable<TSource> query, IFilterRequest request,
             OutputType? outputType = null, ArrayOutputType? arrayOutputType = null)
         {
             var result = new MutableDataTableResult(query.Cast<object>(), request, outputType);
@@ -47,9 +47,9 @@ namespace Mvc.Datatables
             return result;
         }
 
-        private static PageResponse<object> ApplyOutputRulesForMutable(PageResponse<object> sourceData, ArrayOutputType? arrayOutputType = null)
+        private static IPageResponse<object> ApplyOutputRulesForMutable(IPageResponse<object> sourceData, ArrayOutputType? arrayOutputType = null)
         {
-            PageResponse<object> outputData = sourceData;
+            IPageResponse<object> outputData = sourceData;
 
             switch (arrayOutputType)
             {
@@ -70,7 +70,7 @@ namespace Mvc.Datatables
         /// <param name="transform">Should be a Func<TMutableSource, TTransform></param>
         /// <param name="outputType">The output type</param>
         /// <returns>The action result</returns>
-        public static DataTableResult CreateMutable(IQueryable query, FilterRequest request, object transform,
+        public static DataTableResult CreateMutable(IQueryable query, IFilterRequest request, object transform,
             OutputType? outputType = null, ArrayOutputType? arrayOutputType = null)
         {
             var s = "CreateMutable";
@@ -81,7 +81,7 @@ namespace Mvc.Datatables
             return (DataTableResult)closedCreateMethod.Invoke(null, new object[] { query, request, transform, outputType, arrayOutputType });
         }
 
-        public static DataTableResult CreateMutable(IQueryable query, FilterRequest request,
+        public static DataTableResult CreateMutable(IQueryable query, IFilterRequest request,
             OutputType? outputType = null, ArrayOutputType? arrayOutputType = null)
         {
             var s = "CreateMutable";
@@ -91,16 +91,16 @@ namespace Mvc.Datatables
             return (DataTableResult)closedCreateMethod.Invoke(null, new object[] { query, request, outputType, arrayOutputType });
         }
 
-        public static MutableDataTableResult CreateMutableFromCollection<TSource>(ICollection<TSource> q, FilterRequest request,
+        public static MutableDataTableResult CreateMutableFromCollection<TSource>(ICollection<TSource> q, IFilterRequest request,
             OutputType? outputType = null, ArrayOutputType? arrayOutputType = null)
         {
             return CreateMutable(q.AsQueryable(), request, outputType, arrayOutputType);
         }
 
-        public static MutableDataTableResult CreateMutableFromResponse<TSource, TTransform>(PageResponse<TSource> response,
+        public static MutableDataTableResult CreateMutableFromResponse<TSource, TTransform>(IPageResponse<TSource> response,
             Func<TSource, TTransform> transform, OutputType? outputType = null, ArrayOutputType? arrayOutputType = null)
         {
-            PageResponse<object> mutableResponse = PageResponse<TSource>.ToMutableResponse(response);
+            IPageResponse<object> mutableResponse = PageResponse<TSource>.ToMutableResponse(response);
             var result = new MutableDataTableResult(mutableResponse, outputType);
 
             result.Data = result.Data
@@ -112,10 +112,10 @@ namespace Mvc.Datatables
             return result;
         }
 
-        public static MutableDataTableResult CreateMutableFromResponse<TSource>(PageResponse<TSource> response,
+        public static MutableDataTableResult CreateMutableFromResponse<TSource>(IPageResponse<TSource> response,
             OutputType? outputType = null, ArrayOutputType? arrayOutputType = null)
         {
-            PageResponse<object> mutableResponse = PageResponse<TSource>.ToMutableResponse(response);
+            IPageResponse<object> mutableResponse = PageResponse<TSource>.ToMutableResponse(response);
             var result = new MutableDataTableResult(mutableResponse, outputType);
 
             result.Data = result.Data
@@ -136,13 +136,13 @@ namespace Mvc.Datatables
         /// <param name="request">The request filters</param>
         /// /// <param name="outputType">The output type</param>
         /// <returns>The action result</returns>
-        public static PlainDataTableResult<TSource> CreatePlain<TSource>(IQueryable<TSource> query, FilterRequest request, OutputType? outputType = null)
+        public static PlainDataTableResult<TSource> CreatePlain<TSource>(IQueryable<TSource> query, IFilterRequest request, OutputType? outputType = null)
         {
             var result = new PlainDataTableResult<TSource>(query, request, outputType);
             return result;
         }
 
-        public static DataTableResult CreatePlain(IQueryable query, FilterRequest request, OutputType? outputType = null)
+        public static DataTableResult CreatePlain(IQueryable query, IFilterRequest request, OutputType? outputType = null)
         {
             var s = "CreatePlain";
             var openCreateMethod = typeof(DataTableResultFactory).GetMethods().Single(x => x.Name == s && x.GetGenericArguments().Count() == 1);
@@ -151,12 +151,12 @@ namespace Mvc.Datatables
             return (DataTableResult)closedCreateMethod.Invoke(null, new object[] { query, request, outputType });
         }
 
-        public static PlainDataTableResult<TSource> CreatePlainFromCollection<TSource>(ICollection<TSource> q, FilterRequest request, OutputType? outputType = null)
+        public static PlainDataTableResult<TSource> CreatePlainFromCollection<TSource>(ICollection<TSource> q, IFilterRequest request, OutputType? outputType = null)
         {
             return CreatePlain(q.AsQueryable(), request, outputType);
         }
 
-        public static PlainDataTableResult<TSource> CreatePlainFromResponse<TSource>(PageResponse<TSource> response,
+        public static PlainDataTableResult<TSource> CreatePlainFromResponse<TSource>(IPageResponse<TSource> response,
             OutputType? outputType = null)
         {
             var result = new PlainDataTableResult<TSource>(response, outputType);

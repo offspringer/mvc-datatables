@@ -1,15 +1,15 @@
 ﻿using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using System.Web.Mvc;
 
 namespace Mvc.Datatables.Util
 {
-	public static class JsonConvertHelper
+	public static class FormConvertHelper
 	{
-		public static void ReadJson(object message, Dictionary<string, JProperty> otherProperties, JsonSerializer serializer, Func<PropertyDescriptor, bool> shouldBypass)
+		public static void ReadForm(object message, Dictionary<string, object> otherValues, Func<PropertyDescriptor, bool> shouldBypass)
 		{
 			Type objectType = message.GetType();
 			ICustomTypeDescriptor typeDescriptor = TypeDescriptor.GetProvider(objectType).GetTypeDescriptor(objectType);
@@ -24,17 +24,21 @@ namespace Mvc.Datatables.Util
 					JsonPropertyAttribute propAttr = propertyDescriptor.Attributes.Cast<Attribute>().OfType<JsonPropertyAttribute>().SingleOrDefault();
 					string propertyName = propAttr != null ? propAttr.PropertyName : propertyDescriptor.Name;
 
-					if (otherProperties.ContainsKey(propertyName))
+					if (otherValues.ContainsKey(propertyName))
 					{
-						object value = otherProperties[propertyName].Value.ToObject(propertyDescriptor.PropertyType,
-							serializer);
-						propertyDescriptor.SetValue(message, value);
+						if (otherValues[propertyName] != null)
+						{
+							object convertedValue = TypeHelper.GetDefaultValue(propertyDescriptor.PropertyType);
+							bool success = TypeHelper.TryCast(otherValues[propertyName], out convertedValue, propertyDescriptor.PropertyType);
+							if (success)
+								propertyDescriptor.SetValue(message, convertedValue);
+						}
 					}
 				}
 			}
 		}
 
-		public static void WriteJson(object message, JsonWriter writer, JsonSerializer serializer, Func<PropertyDescriptor, bool> shouldBypass)
+		public static void ReadForm(object message, IValueProvider valueProvider, Func<PropertyDescriptor, bool> shouldBypass)
 		{
 			Type objectType = message.GetType();
 			ICustomTypeDescriptor typeDescriptor = TypeDescriptor.GetProvider(objectType).GetTypeDescriptor(objectType);
@@ -48,10 +52,13 @@ namespace Mvc.Datatables.Util
 				{
 					JsonPropertyAttribute propAttr = propertyDescriptor.Attributes.Cast<Attribute>().OfType<JsonPropertyAttribute>().SingleOrDefault();
 					string propertyName = propAttr != null ? propAttr.PropertyName : propertyDescriptor.Name;
-					object propertyValue = propertyDescriptor.GetValue(message);
 
-					writer.WritePropertyName(propertyName);
-					serializer.Serialize(writer, propertyValue);
+					ValueProviderResult valueResult = valueProvider.GetValue(propertyName);
+					if (valueResult != null)
+					{
+						object convertedValue = valueResult.ConvertTo(propertyDescriptor.PropertyType);
+						propertyDescriptor.SetValue(message, convertedValue);
+					}
 				}
 			}
 		}

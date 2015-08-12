@@ -1,22 +1,22 @@
-﻿using System.Linq;
-using Mvc.Datatables.Processing;
+﻿using Mvc.Datatables.Processing;
+using System.Linq;
 
 namespace Mvc.Datatables.Output
 {
-	public class PlainDataTableResult<TSource> : DataTableResult<PageResponse<TSource>>
-	{
-        public PlainDataTableResult(PageResponse<TSource> data, OutputType? outputType = null)
+    public class PlainDataTableResult<TSource> : DataTableResult<IPageResponse<TSource>>
+    {
+        public PlainDataTableResult(IPageResponse<TSource> data, OutputType? outputType = null)
             : base(outputType)
-		{
-			this.Data = data;
-		}
+        {
+            this.Data = data;
+        }
 
-        public PlainDataTableResult(IQueryable<TSource> query, FilterRequest request, OutputType? outputType = null)
+        public PlainDataTableResult(IQueryable<TSource> query, IFilterRequest request, OutputType? outputType = null)
             : base(outputType)
-		{
-			IDataTableFilterProcessor filterProcessor = new DataTablesFilterProcessor();
-			IDataTableProcessor processor = new DataTableProcessor(filterProcessor);
-			this.Data = processor.Process(query, request);
-		}
-	}
+        {
+            IDataTableFilterProcessor filterProcessor = new DataTableFilterProcessor();
+            IDataTableProcessor processor = new DataTableProcessor(filterProcessor);
+            this.Data = processor.Process(query, request);
+        }
+    }
 }

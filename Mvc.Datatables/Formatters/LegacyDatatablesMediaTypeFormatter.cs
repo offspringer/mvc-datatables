@@ -12,59 +12,59 @@ using System.Threading.Tasks;
 
 namespace Mvc.Datatables.Formatters
 {
-	public class LegacyDatatablesMediaTypeFormatter : JsonMediaTypeFormatter
-	{
-		public static readonly string ApplicationDatatablesMediaType = "application/datatables";
-		public static readonly string TextDatatablesMediaType = "text/datatables";
+    public class LegacyDatatablesMediaTypeFormatter : JsonMediaTypeFormatter
+    {
+        public static readonly string ApplicationDatatablesMediaType = "application/json+datatables";
+        public static readonly string TextDatatablesMediaType = "text/json+datatables";
 
-		public LegacyDatatablesMediaTypeFormatter()
-			: base()
-		{
-			this.SupportedMediaTypes.Clear();
-			this.SupportedMediaTypes.Add(new MediaTypeHeaderValue(ApplicationDatatablesMediaType));
-			this.SupportedMediaTypes.Add(new MediaTypeHeaderValue(TextDatatablesMediaType));
+        public LegacyDatatablesMediaTypeFormatter()
+            : base()
+        {
+            this.SupportedMediaTypes.Clear();
+            this.SupportedMediaTypes.Add(new MediaTypeHeaderValue(ApplicationDatatablesMediaType));
+            this.SupportedMediaTypes.Add(new MediaTypeHeaderValue(TextDatatablesMediaType));
 
-			this.MediaTypeMappings.Clear();
-			this.AddRequestHeaderMapping("x-requested-with", "XMLHttpRequest", StringComparison.OrdinalIgnoreCase, true, ApplicationDatatablesMediaType);
+            this.MediaTypeMappings.Clear();
+            this.AddRequestHeaderMapping("x-requested-with", "XMLHttpRequest", StringComparison.OrdinalIgnoreCase, true, ApplicationDatatablesMediaType);
 
-			this.SerializerSettings.Converters.Add(new LegacyFilterRequestConverter());
-			this.SerializerSettings.Converters.Add(new LegacyPageResponseConverter());
+            this.SerializerSettings.Converters.Add(new LegacyFilterRequestConverter());
+            this.SerializerSettings.Converters.Add(new LegacyPageResponseConverter());
             this.SerializerSettings.Converters.Add(new StringEnumConverter());
 
             this.SerializerSettings.Formatting = Formatting.Indented;
             this.SerializerSettings.NullValueHandling = NullValueHandling.Ignore;
-		}
+        }
 
-		public new static MediaTypeHeaderValue DefaultMediaType
-		{
-			get
-			{
-				return new MediaTypeHeaderValue(ApplicationDatatablesMediaType);
-			}
-		}
+        public new static MediaTypeHeaderValue DefaultMediaType
+        {
+            get
+            {
+                return new MediaTypeHeaderValue(ApplicationDatatablesMediaType);
+            }
+        }
 
-		public override void SetDefaultContentHeaders(Type type, HttpContentHeaders headers, MediaTypeHeaderValue mediaType)
-		{
-			base.SetDefaultContentHeaders(type, headers, mediaType);
-		}
+        public override void SetDefaultContentHeaders(Type type, HttpContentHeaders headers, MediaTypeHeaderValue mediaType)
+        {
+            base.SetDefaultContentHeaders(type, headers, mediaType);
+        }
 
-		public override bool CanReadType(Type type)
-		{
-			foreach (var converter in this.SerializerSettings.Converters)
-				if (converter.CanConvert(type))
-					return true;
+        public override bool CanReadType(Type type)
+        {
+            foreach (var converter in this.SerializerSettings.Converters)
+                if (converter.GetType() != typeof(StringEnumConverter) && converter.CanConvert(type))
+                    return true;
 
-			return false;
-		}
+            return false;
+        }
 
-		public override bool CanWriteType(Type type)
-		{
-			foreach (var converter in this.SerializerSettings.Converters)
-				if (converter.CanConvert(type))
-					return true;
+        public override bool CanWriteType(Type type)
+        {
+            foreach (var converter in this.SerializerSettings.Converters)
+                if (converter.GetType() != typeof(StringEnumConverter) && converter.CanConvert(type))
+                    return true;
 
-			return false;
-		}
+            return false;
+        }
 
         public override Task<object> ReadFromStreamAsync(Type type, Stream readStream, HttpContent content, IFormatterLogger formatterLogger)
         {
@@ -95,5 +95,5 @@ namespace Mvc.Datatables.Formatters
 
             return task;
         }
-	}
+    }
 }

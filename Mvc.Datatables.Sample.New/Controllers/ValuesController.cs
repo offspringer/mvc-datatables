@@ -42,9 +42,9 @@ namespace Mvc.Datatables.Sample.Controllers
         // POST api/values
         public IHttpActionResult Post([FromBody]FilterRequest filter)
         {
-            DataTablesFilterProcessor filterProcessor = new DataTablesFilterProcessor();
-            DataTableProcessor processor = new DataTableProcessor(filterProcessor);
-            PageResponse<UserProfile> response = processor.Process(UserProfiles.AsQueryable(), filter,
+            IDataTableFilterProcessor filterProcessor = new DataTableFilterProcessor();
+            IDataTableProcessor processor = new DataTableProcessor(filterProcessor);
+            IPageResponse<UserProfile> response = processor.Process(UserProfiles.AsQueryable(), filter,
                 (x) => x.Where(y => y.BirthDate > new DateTime(2014, 01, 01)));
 
             return Ok(response);

@@ -1,4 +1,5 @@
-﻿using Mvc.Datatables.Output;
+﻿using Mvc.Datatables.Formatters;
+using Mvc.Datatables.Output;
 using Mvc.Datatables.Sample.Models;
 using Mvc.Datatables.Serialization;
 using Newtonsoft.Json;
@@ -43,7 +44,7 @@ namespace Mvc.Datatables.Sample.Controllers
             // Prepare input
             string serializedObject = JsonConvert.SerializeObject(filter, new FilterRequestConverter());
             StringContent stringContent = new StringContent(
-                serializedObject, UnicodeEncoding.UTF8, "application/datatables");
+                serializedObject, UnicodeEncoding.UTF8, DatatablesMediaTypeFormatter.ApplicationDatatablesMediaType);
 
             // Post
             HttpClient client = new HttpClient();

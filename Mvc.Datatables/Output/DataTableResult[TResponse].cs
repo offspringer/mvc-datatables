@@ -1,8 +1,8 @@
-﻿using System;
+﻿using Mvc.Datatables.Serialization;
+using Newtonsoft.Json;
+using System;
 using System.Web;
 using System.Web.Mvc;
-using Mvc.Datatables.Serialization;
-using Newtonsoft.Json;
 
 namespace Mvc.Datatables.Output
 {

@@ -1,5 +1,8 @@
+using Mvc.Datatables.Util;
 using System;
+using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.Linq;
 using System.Text.RegularExpressions;
 using System.Web.Mvc;
 
@@ -10,9 +13,27 @@ namespace Mvc.Datatables.Serialization
 	/// </summary>
 	public class FilterRequestModelBinder : IModelBinder
 	{
+		private readonly Type _concreteType;
+
+		public FilterRequestModelBinder(Type concreteType = null)
+		{
+			if (concreteType != null)
+			{
+				if (!concreteType.IsClass)
+					throw new NotSupportedException();
+
+				if (!concreteType.GetInterfaces().Any(x => x == typeof(IFilterRequest)))
+					throw new NotSupportedException();
+
+				this._concreteType = concreteType;
+			}
+			else
+				this._concreteType = typeof(FilterRequest);
+		}
+
 		public object BindModel(ControllerContext controllerContext, ModelBindingContext bindingContext)
 		{
-			FilterRequest message = new FilterRequest();
+			IFilterRequest message = Activator.CreateInstance(_concreteType) as IFilterRequest;
 
 			ReadConfiguration(ref message, controllerContext.HttpContext.Request.QueryString);
 			ReadConfiguration(ref message, controllerContext.HttpContext.Request.Form);
@@ -20,8 +41,10 @@ namespace Mvc.Datatables.Serialization
 			return message;
 		}
 
-		private void ReadConfiguration(ref FilterRequest message, NameValueCollection collection)
+		private void ReadConfiguration(ref IFilterRequest message, NameValueCollection collection)
 		{
+			Dictionary<string, object> otherValues = new Dictionary<string, object>();
+
 			foreach (string key in collection.AllKeys)
 			{
 				if (key == "draw")
@@ -43,11 +66,17 @@ namespace Mvc.Datatables.Serialization
 					ReadSortConfiguration(ref message, key, collection[key]);
 
 				else if (key.StartsWith("columns"))
-					ReadColumnConfiguration(ref message, key, collection[key]);		        
+					ReadColumnConfiguration(ref message, key, collection[key]);
+
+				else
+					otherValues.Add(key, collection[key]);
 			}
+
+			FormConvertHelper.ReadForm(message, otherValues,
+				prop => FormConvertHelper.GetPropertiesFromType(typeof(IFilterRequest)).Select(x => x.Name).Contains(prop.Name));
 		}
 
-		private void ReadSortConfiguration(ref FilterRequest message, string key, object value)
+		private void ReadSortConfiguration(ref IFilterRequest message, string key, object value)
 		{
 			Match match = Regex.Match(key, @"order\[([0-9]+)\](.+)");
 			if (match.Success && match.Groups.Count == 3)
@@ -66,7 +95,7 @@ namespace Mvc.Datatables.Serialization
 			}
 		}
 
-		private void ReadColumnConfiguration(ref FilterRequest message, string key, object value)
+		private void ReadColumnConfiguration(ref IFilterRequest message, string key, object value)
 		{
 			Match match = Regex.Match(key, @"columns\[([0-9]+)\](.+)");
 			if (match.Success && match.Groups.Count == 3)
@@ -74,7 +103,7 @@ namespace Mvc.Datatables.Serialization
 				int index = Convert.ToInt32(match.Groups[1].Value);
 				string propertyName = match.Groups[2].Value;
 
-				Column currentColumn = null;
+				IColumn currentColumn = null;
 
 				if (!message.HasColumn(index))
 				{
