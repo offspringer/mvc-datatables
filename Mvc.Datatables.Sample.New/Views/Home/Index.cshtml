@@ -24,20 +24,16 @@
 </div>
 
 <script id="details-template" type="text/x-handlebars-template">
-    <tr>
-        <td colspan="7">
-            <table cellpadding="5" cellspacing="0" border="0" style="margin-left: 50px;">
-                <tr>
-                    <td><b>Country:</b></td>
-                    <td>{{Country}}</td>
-                </tr>
-                <tr>
-                    <td><b>Birth date:</b></td>
-                    <td>{{BirthDate}}</td>
-                </tr>
-            </table>
-        </td>
-    </tr>
+    <table class="table table-striped table-bordered table-condensed compact dataTable no-footer">
+        <tr>
+            <td><b>Country:</b></td>
+            <td>{{Country}}</td>
+        </tr>
+        <tr>
+            <td><b>Birth date:</b></td>
+            <td>{{BirthDate}}</td>
+        </tr>
+    </table>
 </script>
 
 <script id="actions-template" type="text/x-handlebars-template">
@@ -85,7 +81,7 @@
         };
     </script>
     <script type="text/javascript">
-        $(document).ready(function() {
+        $(document).ready(function () {
             startDataTable();
         });
     </script>

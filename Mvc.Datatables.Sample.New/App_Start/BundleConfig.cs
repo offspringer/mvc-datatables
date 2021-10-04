@@ -17,22 +17,23 @@ namespace Mvc.Datatables.Sample
                         "~/Scripts/modernizr-*"));
 
             bundles.Add(new ScriptBundle("~/bundles/bootstrap").Include(
-                      "~/Scripts/bootstrap.js",
-                      "~/Scripts/bootbox.js",
-                      "~/Scripts/respond.js"));
+                      "~/Scripts/bootstrap.bundle.js",
+                      "~/Scripts/respond.js",
+                      "~/Scripts/bootbox.all.js"));
 
             bundles.Add(new ScriptBundle("~/bundles/handlebars").Include(
                       "~/Scripts/handlebars.js"));
 
             bundles.Add(new ScriptBundle("~/bundles/dataTables").Include(
-                      "~/Scripts/DataTables/jquery.dataTables.js"));
+                      "~/Scripts/DataTables/jquery.dataTables.js",
+                      "~/Scripts/DataTables/dataTables.bootstrap4.js"));
 
             bundles.Add(new ScriptBundle("~/bundles/site").Include(
                       "~/Scripts/site.js"));
 
             bundles.Add(new StyleBundle("~/Content/css").Include(
                       "~/Content/bootstrap.css",
-                      "~/Content/bootstrap.datatables.css",
+                      "~/Content/DataTables/css/dataTables.bootstrap4.css",
                       "~/Content/site.css"));
 
             // Set EnableOptimizations to false for debugging. For more information,

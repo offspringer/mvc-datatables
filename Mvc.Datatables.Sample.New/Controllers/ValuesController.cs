@@ -1,7 +1,7 @@
 ﻿using System;
 using Mvc.Datatables.Processing;
 using Mvc.Datatables.Sample.Models;
-using Ploeh.AutoFixture;
+using AutoFixture;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
@@ -22,7 +22,7 @@ namespace Mvc.Datatables.Sample.Controllers
         }
 
         // GET api/values
-        public ICollection<UserProfile> Get([FromBody]FilterRequest filter)
+        public ICollection<UserProfile> Get([FromBody] FilterRequest filter)
         {
             return UserProfiles;
         }
@@ -34,13 +34,7 @@ namespace Mvc.Datatables.Sample.Controllers
         }
 
         // POST api/values
-        //public void Post([FromBody]UserProfile userProfile)
-        //{
-        //    UserProfiles.Add(userProfile);
-        //}
-
-        // POST api/values
-        public IHttpActionResult Post([FromBody]FilterRequest filter)
+        public IHttpActionResult Post([FromBody] FilterRequest filter)
         {
             IDataTableFilterProcessor filterProcessor = new DataTableFilterProcessor();
             IDataTableProcessor processor = new DataTableProcessor(filterProcessor);
@@ -48,21 +42,6 @@ namespace Mvc.Datatables.Sample.Controllers
                 (x) => x.Where(y => y.BirthDate > new DateTime(2014, 01, 01)));
 
             return Ok(response);
-        }
-
-        // PUT api/values/5
-        public void Put(int id, [FromBody]UserProfile userProfile)
-        {
-            UserProfile aux = UserProfiles.FirstOrDefault(x => x.Id == id);
-            UserProfiles.Remove(aux);
-            UserProfiles.Add(userProfile);
-        }
-
-        // DELETE api/values/5
-        public void Delete(int id)
-        {
-            UserProfile aux = UserProfiles.FirstOrDefault(x => x.Id == id);
-            UserProfiles.Remove(aux);
         }
     }
 }

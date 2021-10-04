@@ -12,7 +12,7 @@
 		<requireLicenseAcceptance>false</requireLicenseAcceptance>
 		<description>$description$</description>
 		<releaseNotes>Experimental release.</releaseNotes>
-		<copyright>Copyright 2015</copyright>
+		<copyright>Copyright 2021</copyright>
 		<tags>mvc jquery datatables</tags>
 	</metadata>
 </package>
