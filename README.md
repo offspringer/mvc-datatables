@@ -2,6 +2,7 @@
 [![Forks][forks-shield]][forks-url]
 [![Stargazers][stars-shield]][stars-url]
 [![Issues][issues-shield]][issues-url]
+[![MIT License][license-shield]][license-url]
 [![LinkedIn][linkedin-shield]][linkedin-url]
 
 ## About The Project
@@ -54,6 +55,10 @@ Contributions are what make the open source community such an amazing place to l
 
 5. Open a Pull Request
  
+## License
+
+Distributed under the MIT License. See `LICENSE` for more information.
+
 ## Acknowledgements
 
 * [StackEdit](https://stackedit.io)
@@ -73,5 +78,7 @@ Contributions are what make the open source community such an amazing place to l
 [stars-url]: https://github.com/offspringer/mvc-datatables/stargazers
 [issues-shield]: https://img.shields.io/github/issues/offspringer/mvc-datatables.svg?style=for-the-badge
 [issues-url]: https://github.com/offspringer/mvc-datatables/issues
+[license-shield]: https://img.shields.io/github/license/offspringer/mvc-datatables.svg?style=for-the-badge
+[license-url]: https://github.com/offspringer/mvc-datatables/blob/master/LICENSE
 [linkedin-shield]: https://img.shields.io/badge/-LinkedIn-black.svg?style=for-the-badge&logo=linkedin&colorB=555
 [linkedin-url]: https://www.linkedin.com/in/rogertdsantos/
