@@ -1,18 +1,18 @@
-<?xml version="1.0"?>
-<package >
+<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd">
 	<metadata>
 		<id>$id$</id>
 		<version>$version$</version>
 		<title>$title$</title>
 		<authors>Harry McIntyre, Christopher Deutsch, Roger Santos</authors>
 		<owners>Roger Santos</owners>
-		<licenseUrl>https://github.com/offspringer/mvc.datatables/blob/master/LICENSE</licenseUrl>
-		<projectUrl>https://github.com/offspringer/mvc.datatables</projectUrl>
+		<license type="expression">MIT</license>
+		<projectUrl>https://github.com/offspringer/mvc-datatables</projectUrl>
 		<iconUrl>http://www.datatables.net/media/images/DataTables.jpg</iconUrl>
 		<requireLicenseAcceptance>false</requireLicenseAcceptance>
 		<description>$description$</description>
-		<releaseNotes>Experimental release.</releaseNotes>
+		<releaseNotes>Minor bug fixes and improvements.</releaseNotes>
 		<copyright>Copyright 2021</copyright>
-		<tags>mvc jquery datatables</tags>
+		<tags>datatables dot-net asp-net-mvc dot-net-web-api</tags>
 	</metadata>
 </package>
